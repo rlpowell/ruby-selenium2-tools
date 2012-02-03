@@ -1,0 +1,9 @@
+---
+conditions:
+  -
+    - server
+    - prod
+  -
+    - experiment
+    - basic
+server_url: "http://www.google.com"

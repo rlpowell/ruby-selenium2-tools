@@ -157,6 +157,20 @@ module GeneralSeleniumUtility
   end
 
   #****************
+  # Click on the given element
+  #
+  # It's called "no_move" because there's no expectation of a page
+  # transition for these clicks, i.e. fast javascript response is
+  # expected.
+  #****************
+  def no_move_click(how, what, tag_name)
+      e = @driver.find_element(how, what)
+      @debug and print "In no_move_click, e: #{e}\n"
+      e.tag_name.should == tag_name
+      e.click.should be_nil
+  end
+
+  #****************
   # Takes a list of how, what, and tag_name, which work as usual.
   # For each such element, runs the "before" function, if any, then
   # click on the element, then run the "after" function, if any.
@@ -172,10 +186,7 @@ module GeneralSeleniumUtility
         @debug and print "In multi_no_move_click, calling before\n"
         before.call
       end
-      e = @driver.find_element(how, what)
-      @debug and print "In multi_no_move_click, e: #{e}\n"
-      e.tag_name.should == tag_name
-      e.click.should be_nil
+      no_move_click( how, what, tag_name )
       if after
         @debug and print "In multi_no_move_click, calling after\n"
         after.call
