@@ -7,11 +7,11 @@ share_as :Translate do
     end
 
     it 'should click on the More link' do
-      no_move_click(:id, 'gbztms1', 'span')
+      no_move_click('translate_more_link')
     end
 
     it 'should click on the translate link and load the new page' do
-      check_element_click(:id, "gb_51", "a", "^http://translate.google.com/.hl=en.tab=wT$"  )
+      check_element_click('translate_click_translate')
       quiesce
     end
   end

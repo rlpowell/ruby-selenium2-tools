@@ -17,14 +17,14 @@ share_as :Setup do
       # there right now 0.o (31 Jan 2012), so we test for which to
       # do
       begin
-        no_move_click(:id, 'psyDrag', 'div')
+        no_move_click('setup_instant_predictions_div1')
       rescue
-        no_move_click(:id, ':2.label', 'div')
+        no_move_click('setup_instant_predictions_div2')
       end
     end
 
     it "should save the new setting" do
-      check_element_click(:xpath, "//div[text()='Save']", "div", "^#{@server_url}/$"  )
+      check_element_click('setup_click_save')
     end
   end
 end

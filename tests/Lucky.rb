@@ -7,7 +7,7 @@ share_as :Lucky do
     end
 
     it 'should take the text input' do
-      check_element_send_keys(:id, 'lst-ib', 'input', 'monkeys')
+      check_element_send_keys('lucky_search_monkeys')
     end
 
     it 'should click elsewhere to close the javascripty bits' do
@@ -15,7 +15,7 @@ share_as :Lucky do
     end
 
     it %q{should click on "I'm Feeling Lucky" and load the new page} do
-      check_element_click(:name, "btnI", "input", "^http://en.wikipedia.org/wiki/Monkey$"  )
+      check_element_click('lucky_click_lucky')
       quiesce
     end
   end

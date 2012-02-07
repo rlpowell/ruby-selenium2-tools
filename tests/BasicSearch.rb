@@ -8,7 +8,7 @@ share_as :BasicSearch do
 
     it 'should take the text input' do
       @debug and dump_page_source("/tmp/goog1")
-      check_element_send_keys(:id, 'lst-ib', 'input', 'monkeys')
+      check_element_send_keys('basic_search_search_monkeys')
       @debug and dump_page_source("/tmp/goog2")
     end
 
@@ -18,7 +18,7 @@ share_as :BasicSearch do
 
     it 'should click on search and load the new page' do
       @debug and dump_page_source("/tmp/goog3")
-      check_element_click(:name, "btnK", "input", "^#{@server_url}/.*q=monkeys.*$"  )
+      check_element_click('basic_search_click_search')
       quiesce
       @debug and dump_page_source("/tmp/goog4")
     end

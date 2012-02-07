@@ -1,0 +1,16 @@
+---
+conditions:
+  -
+    - experiment
+    - basic
+
+setup_instant_predictions_div1: - id
+                                - psyDrag
+                                - div
+setup_instant_predictions_div2: - id
+                                - ':2.label'
+                                - div
+setup_click_save: - xpath
+                  - "//div[text()='Save']"
+                  - "div"
+                  - "^http://www.google.com/$"

@@ -1,0 +1,15 @@
+---
+conditions:
+  -
+    - experiment
+    - basic
+
+translate_more_link: - id
+                     - 'gbztms1'
+                     - 'span'
+
+translate_click_translate:
+  - id
+  - "gb_51"
+  - "a"
+  - "^http://translate.google.com/.hl=en.tab=wT$"

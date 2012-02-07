@@ -1,0 +1,17 @@
+---
+conditions:
+  -
+    - experiment
+    - basic
+
+lucky_click_lucky:
+  - name
+  - btnI
+  - "input"
+  - "^http://en.wikipedia.org/wiki/Monkey$"
+
+lucky_search_monkeys:
+  - :id
+  - 'lst-ib'
+  - 'input'
+  - 'monkeys'

@@ -99,7 +99,15 @@ module GeneralSeleniumUtility
   # Finds the given element, checks its name, and types data into
   # the element
   #****************
-  def check_element_send_keys(how, what, tag_name, to_type)
+  def check_element_send_keys(yaml_data_key)
+      check_element_send_keys_raw(
+        $yaml_data[yaml_data_key][0].to_sym,
+        $yaml_data[yaml_data_key][1],
+        $yaml_data[yaml_data_key][2],
+        $yaml_data[yaml_data_key][3]
+      )
+  end
+  def check_element_send_keys_raw(how, what, tag_name, to_type)
     e = @driver.find_element(how, what)
     e.tag_name.should == tag_name
     3.times do |x|
@@ -120,7 +128,16 @@ module GeneralSeleniumUtility
   # the URL we end up at after the click is what we expect and,
   # optionally, eat an alert that comes up.
   #****************
-  def check_element_click(how, what, tag_name, resulting_url, alert_text = nil)
+  def check_element_click(yaml_data_key)
+      check_element_click_raw(
+        $yaml_data[yaml_data_key][0].to_sym,
+        $yaml_data[yaml_data_key][1],
+        $yaml_data[yaml_data_key][2],
+        $yaml_data[yaml_data_key][3],
+        $yaml_data[yaml_data_key][4]
+      )
+  end
+  def check_element_click_raw(how, what, tag_name, resulting_url, alert_text = nil)
     has_dealt_with_alert = false
 
     e = @driver.find_element(how, what)
@@ -163,7 +180,14 @@ module GeneralSeleniumUtility
   # transition for these clicks, i.e. fast javascript response is
   # expected.
   #****************
-  def no_move_click(how, what, tag_name)
+  def no_move_click(yaml_data_key)
+      no_move_click_raw(
+        $yaml_data[yaml_data_key][0].to_sym,
+        $yaml_data[yaml_data_key][1],
+        $yaml_data[yaml_data_key][2]
+      )
+  end
+  def no_move_click_raw(how, what, tag_name)
       e = @driver.find_element(how, what)
       @debug and print "In no_move_click, e: #{e}\n"
       e.tag_name.should == tag_name
@@ -375,7 +399,10 @@ module GeneralSeleniumUtility
   # Gives an element a while (about 5 seconds) to show up on the
   # page, errors if it doesn't.
   #****************
-  def wait_for_element(how, what)
+  def wait_for_element(yaml_data_key)
+    wait_for_element_raw($yaml_data[yaml_data_key][0], $yaml_data[yaml_data_key][1])
+  end
+  def wait_for_element_raw(how, what)
     e = nil
     5.times do |x|
       # note that find-element auto-waits
