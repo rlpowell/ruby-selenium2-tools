@@ -99,9 +99,9 @@ module GeneralSeleniumUtility
   # Go to the page url given by the yaml_data key
   #****************
   def go_to(yaml_data_key)
-    @driver.navigate.to $yaml_data[yaml_data_key]
+    @driver.navigate.to $yaml_data[yaml_data_key][0]
     quiesce
-    @driver.current_url.should == $yaml_data[yaml_data_key]
+    @driver.current_url.should =~ Regexp.new($yaml_data[yaml_data_key][1], Regexp::MULTILINE)
   end
 
   #****************

@@ -15,4 +15,6 @@ setup_click_save: - xpath
                   - "div"
                   - "^http://www.google.com/$"
 
-setup_url: "http://www.google.com/preferences?hl=en"
+setup_url:
+  - "http://www.google.com/preferences?hl=en"
+  - "^http://www.google.com/preferences.hl=en$"

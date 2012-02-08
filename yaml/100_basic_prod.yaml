@@ -3,4 +3,6 @@ conditions:
   -
     - test_set
     - basic
-server_url: "http://www.google.com/"
+server_url:
+  - "http://www.google.com/"
+  - "^http://www.google.com/$"
