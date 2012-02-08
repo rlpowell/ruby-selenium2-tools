@@ -16,6 +16,7 @@ Requirements
 ------------
 
 - rspec
+- erubis
 - selenium-webdriver
 - Selenium Server standalone from http://seleniumhq.org/download/
 
@@ -82,8 +83,8 @@ for a list.
 Most of the rest of the options are of no use with tests as simple
 as the example.
 
-YAML Data
----------
+YAML Data Generation
+--------------------
 
 Part of the point here is to have your tests be driven by data
 files as much as possible, so that you can chance information about
@@ -130,8 +131,13 @@ each possible case can get very annoying, thus it's possible to
 change the main data set (called $yaml_data in the code) from the
 command line:
 
-    bin/runtest.rb -c 'server_url=http://www.google.co.jp/'
+    bin/runtest.rb -c 'base_url=google.co.jp'
 
 This will run the tests with a different server_url in $yaml_data,
 which will make things break pretty badly.  :)  You can use as many
 -c options as you like, and the format is just x=y
+
+To support this sort of variable replacement, all of the library
+functions that take only a $yaml_data key will also perform erb
+replacement just before actual use; look for "base_url" in the yaml
+files to see examples.

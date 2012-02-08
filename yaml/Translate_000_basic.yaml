@@ -12,4 +12,4 @@ translate_click_translate:
   - id
   - "gb_51"
   - "a"
-  - "^http://translate.google.com/.hl=en.tab=wT$"
+  - "^http://translate.<%= $yaml_data['base_url'] %>/.hl=en.tab=wT$"

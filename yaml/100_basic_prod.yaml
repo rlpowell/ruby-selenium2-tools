@@ -3,6 +3,7 @@ conditions:
   -
     - test_set
     - basic
+base_url: "google.com"
 server_url:
-  - "http://www.google.com/"
-  - "^http://www.google.com/$"
+  - "http://www.<%= $yaml_data['base_url'] %>/"
+  - "^http://www.<%= $yaml_data['base_url'] %>/$"

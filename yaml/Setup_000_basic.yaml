@@ -13,8 +13,8 @@ setup_instant_predictions_div2: - id
 setup_click_save: - xpath
                   - "//div[text()='Save']"
                   - "div"
-                  - "^http://www.google.com/$"
+                  - "^http://www.<%= $yaml_data['base_url'] %>/$"
 
 setup_url:
-  - "http://www.google.com/preferences?hl=en"
-  - "^http://www.google.com/preferences.hl=en$"
+  - "http://www.<%= $yaml_data['base_url'] %>/preferences?hl=en"
+  - "^http://www.<%= $yaml_data['base_url'] %>/preferences.hl=en$"

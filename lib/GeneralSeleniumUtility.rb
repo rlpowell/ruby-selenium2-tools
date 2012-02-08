@@ -92,16 +92,49 @@ module GeneralSeleniumUtility
   def load_yaml_data( file )
     yaml_data = {}
     yaml_data.merge!( File.open( file ) { |yf| YAML::load( yf ) } )
+
     return yaml_data
+  end
+
+  def erubisize( data )
+    require 'erubis'
+    eruby = Erubis::Eruby.new( data )
+    value = eruby.result(binding())
+
+    return value
+  end
+  def get_yaml_data( yaml_data_key, sub_key = nil )
+    data = $yaml_data[yaml_data_key] 
+
+    # print "gyd: data first: "+data.inspect+"\n"
+
+    if sub_key
+      data = data[sub_key]
+    end
+
+    # print "gyd: data second: "+data.inspect+"\n"
+
+    # Do erb processing in most normal cases
+    if data.class == Array
+      data.map! { |x| erubisize(x) }
+    elsif data.class == Hash
+      data.keys { |x| data[x] = erubisize(data[x]) }
+    elsif data.class == String
+      data = erubisize(data)
+    end
+
+    # print "gyd: data after: "+data.inspect+"\n"
+
+    return data
   end
 
   #****************
   # Go to the page url given by the yaml_data key
   #****************
   def go_to(yaml_data_key)
-    @driver.navigate.to $yaml_data[yaml_data_key][0]
+    @driver.navigate.to get_yaml_data( yaml_data_key, 0 )
     quiesce
-    @driver.current_url.should =~ Regexp.new($yaml_data[yaml_data_key][1], Regexp::MULTILINE)
+    @driver.current_url.should =~ Regexp.new(get_yaml_data(yaml_data_key, 1), Regexp::MULTILINE)
   end
 
   #****************
@@ -110,10 +143,10 @@ module GeneralSeleniumUtility
   #****************
   def check_element_send_keys(yaml_data_key)
       check_element_send_keys_raw(
-        $yaml_data[yaml_data_key][0].to_sym,
-        $yaml_data[yaml_data_key][1],
-        $yaml_data[yaml_data_key][2],
-        $yaml_data[yaml_data_key][3]
+        get_yaml_data( yaml_data_key, 0 ).to_sym,
+        get_yaml_data( yaml_data_key, 1 ),
+        get_yaml_data( yaml_data_key, 2 ),
+        get_yaml_data( yaml_data_key, 3 )
       )
   end
   def check_element_send_keys_raw(how, what, tag_name, to_type)
@@ -139,11 +172,11 @@ module GeneralSeleniumUtility
   #****************
   def check_element_click(yaml_data_key)
       check_element_click_raw(
-        $yaml_data[yaml_data_key][0].to_sym,
-        $yaml_data[yaml_data_key][1],
-        $yaml_data[yaml_data_key][2],
-        $yaml_data[yaml_data_key][3],
-        $yaml_data[yaml_data_key][4]
+        get_yaml_data( yaml_data_key, 0 ).to_sym,
+        get_yaml_data( yaml_data_key, 1 ),
+        get_yaml_data( yaml_data_key, 2 ),
+        get_yaml_data( yaml_data_key, 3 ),
+        get_yaml_data( yaml_data_key, 4 )
       )
   end
   def check_element_click_raw(how, what, tag_name, resulting_url, alert_text = nil)
@@ -191,9 +224,9 @@ module GeneralSeleniumUtility
   #****************
   def no_move_click(yaml_data_key)
       no_move_click_raw(
-        $yaml_data[yaml_data_key][0].to_sym,
-        $yaml_data[yaml_data_key][1],
-        $yaml_data[yaml_data_key][2]
+        get_yaml_data( yaml_data_key, 0 ).to_sym,
+        get_yaml_data( yaml_data_key, 1 ),
+        get_yaml_data( yaml_data_key, 2 )
       )
   end
   def no_move_click_raw(how, what, tag_name)
@@ -409,7 +442,7 @@ module GeneralSeleniumUtility
   # page, errors if it doesn't.
   #****************
   def wait_for_element(yaml_data_key)
-    wait_for_element_raw($yaml_data[yaml_data_key][0], $yaml_data[yaml_data_key][1])
+    wait_for_element_raw(get_yaml_data( yaml_data_key, 0 ), get_yaml_data( yaml_data_key, 1 ))
   end
   def wait_for_element_raw(how, what)
     e = nil
