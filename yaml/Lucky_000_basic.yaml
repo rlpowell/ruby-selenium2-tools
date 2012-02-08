@@ -1,7 +1,7 @@
 ---
 conditions:
   -
-    - experiment
+    - test_set
     - basic
 
 lucky_click_lucky:

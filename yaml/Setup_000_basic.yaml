@@ -1,7 +1,7 @@
 ---
 conditions:
   -
-    - experiment
+    - test_set
     - basic
 
 setup_instant_predictions_div1: - id
@@ -14,3 +14,5 @@ setup_click_save: - xpath
                   - "//div[text()='Save']"
                   - "div"
                   - "^http://www.google.com/$"
+
+setup_url: "http://www.google.com/preferences?hl=en"

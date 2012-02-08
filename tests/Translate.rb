@@ -3,7 +3,7 @@ require 'rspec'
 share_as :Translate do
   describe 'go to the google translate page via the main site' do
     it "should load the main page" do
-      @driver.navigate.to @server_url
+      go_to('server_url')
     end
 
     it 'should click on the More link' do

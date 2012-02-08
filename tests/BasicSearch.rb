@@ -3,7 +3,7 @@ require 'rspec'
 share_as :BasicSearch do
   describe 'run a basic search on Google' do
     it "should load the main page" do
-      @driver.navigate.to @server_url
+      go_to('server_url')
     end
 
     it 'should take the text input' do
@@ -13,7 +13,7 @@ share_as :BasicSearch do
     end
 
     it 'should click elsewhere to close the javascripty bits' do
-      click_logo
+      click_irrelevant
     end
 
     it 'should click on search and load the new page' do

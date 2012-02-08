@@ -1,7 +1,10 @@
 module GoogleUtility
-  def click_logo
+  def click_irrelevant
     quiesce
-    no_move_click_raw(:id, 'hplogo', 'img')
+    # Clicks the more link, twice
+    no_move_click_raw(:id, 'gbztms1', 'span')
+    quiesce
+    no_move_click_raw(:id, 'gbztms1', 'span')
     quiesce
   end
 end

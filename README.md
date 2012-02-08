@@ -122,3 +122,16 @@ assuming that /tmp/goog4 has the right data, with this command:
 
     bin/yaml_generate.rb "-f" "/tmp/goog4" "-x" "//div[@id='ires']" "-a" "text" "-H" "basic_search_em_data" "-R" "/em[^/]*$"
 
+Altering Tests From The Command Line
+------------------------------------
+
+If you have a complicated test matrix, writing seperate tests for
+each possible case can get very annoying, thus it's possible to
+change the main data set (called $yaml_data in the code) from the
+command line:
+
+    bin/runtest.rb -c 'server_url=http://www.google.co.jp/'
+
+This will run the tests with a different server_url in $yaml_data,
+which will make things break pretty badly.  :)  You can use as many
+-c options as you like, and the format is just x=y

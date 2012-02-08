@@ -1,7 +1,7 @@
 ---
 conditions:
   -
-    - experiment
+    - test_set
     - basic
 
 basic_search_click_search:

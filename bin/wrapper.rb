@@ -22,9 +22,8 @@ else
 end
 $port = ENV['PORT']
 $browser = ENV['BROWSER']
-$server = ENV['SERVER']
-$experiment = ENV['EXPERIMENT']
-$release = ENV['RELEASE']
+$test_set = ENV['TEST_SET']
+$extra_config = YAML::load(ENV['CONFIG'])
 
 def check_conditions(conditions)
   conditions.each do |condition|
@@ -34,16 +33,9 @@ def check_conditions(conditions)
 end
 
 def check_condition(condition)
-  $debug and puts "In check_condition: #{condition.inspect}\n"
-  if condition[0] == 'experiment'
-    return condition[1] == $experiment
-  end
-  if condition[0] == 'server'
-    return condition[1] == $server
-  end
-  if condition[0] == 'release'
-    return condition[1] == $release
-  end
+  value=$yaml_data[condition[0]] == condition[1]
+  $debug and puts "In check_condition: #{condition.inspect}, which is #{value.inspect}; #{condition[0]}, #{$yaml_data[condition[0]]} == #{condition[1]}\n"
+  return $yaml_data[condition[0]] == condition[1]
 end
 
 require 'GeneralSeleniumUtility.rb'
@@ -51,6 +43,9 @@ include GeneralSeleniumUtility
 
 # Load our own config
 $yaml_data = load_yaml_data("yaml/wrapper.yaml")
+$yaml_data['test_set'] = $test_set
+$yaml_data['port'] = $port
+$yaml_data['browser'] = $browser
 if $yaml_data['wrapper_modules']
   $yaml_data['wrapper_modules'].each do |module_name|
     $debug and print "adding #{module_name}.rb\n"
@@ -108,6 +103,9 @@ $yaml_data['sections'].each do |section|
   end
 end
 
+# Now load in any special config
+$yaml_data.merge!($extra_config)
+
 describe "wrapper" do
   include GeneralSeleniumUtility
   if $yaml_data['wrapper_modules']
@@ -122,31 +120,17 @@ describe "wrapper" do
     @debug = $debug
     @port = $port
     @browser = $browser
-    @server = $server
-    @experiment = $experiment
-    @release = $release
+    @test_set = $test_set
     @yaml_data = $yaml_data
-
-    @server_url = $yaml_data['server_url']
 
     selenium_setup
 
   end
 
   $yaml_data['sections'].each do |section|
-    realsection = section
-    if Dir.glob("tests/#{section}_#{$release}.rb").length > 0
-      realsection = "#{section}_#{$release}"
-    end
-    if Dir.glob("tests/#{section}_#{$experiment}.rb").length > 0
-      realsection = "#{section}_#{$experiment}"
-    end
-    if Dir.glob("tests/#{section}_#{$experiment}_#{$release}.rb").length > 0
-      realsection = "#{section}_#{$experiment}_#{$release}"
-    end
-    print "Running tests from #{realsection}.rb\n"
-    require "tests/#{realsection}.rb"
-    include Module.const_get(realsection)
+    print "Running tests from #{section}.rb\n"
+    require "tests/#{section}.rb"
+    include Module.const_get(section)
   end
 
   after(:all) do

@@ -1,5 +1,2 @@
 browser: firefox
-server: prod
-release: all
-experiment: basic
-releases: - all
+test_set: basic

@@ -9,7 +9,7 @@ share_as :Setup do
     end
 
     it "should load the setup page" do
-      @driver.navigate.to "http://www.google.com/preferences?hl=en"
+      go_to('setup_url')
     end
 
     it "should change to no instant predictions" do
