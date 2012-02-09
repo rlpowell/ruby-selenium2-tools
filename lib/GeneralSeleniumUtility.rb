@@ -180,8 +180,6 @@ module GeneralSeleniumUtility
       )
   end
   def check_element_click_raw(how, what, tag_name, resulting_url, alert_text = nil)
-    has_dealt_with_alert = false
-
     e = @driver.find_element(how, what)
     e.tag_name.should == tag_name
     e.click.should be_nil
@@ -190,25 +188,21 @@ module GeneralSeleniumUtility
     10.times do 
       # this sometimes fails due to popups, at least on chrome
       begin
+        if alert_text
+          eat_alert( alert_text )
+        end
+
         quiesce
       rescue Exception => e
         @debug and print "Got exception in check_element_click: #{e}\n"
-
-        if alert_text and not has_dealt_with_alert
-          eat_alert( alert_text )
-          has_dealt_with_alert = true
-        end
       end
+
       if @driver.current_url =~ Regexp.new(resulting_url, Regexp::MULTILINE)
         break
       end
+
       sleep 5
       print '#'
-    end
-
-    if alert_text and not has_dealt_with_alert
-      eat_alert( alert_text )
-      has_dealt_with_alert = true
     end
 
     check_url_match(resulting_url)
@@ -328,10 +322,15 @@ module GeneralSeleniumUtility
       File.open("/dev/tty", "r").gets
       quiesce
     else
-      a = @driver.switch_to.alert
-      a.text.should == text
-      a.accept
-      quiesce
+      begin
+        quiesce
+        a = @driver.switch_to.alert
+        a.text.should == text
+        a.accept
+        quiesce
+      rescue Exception => e
+          @debug and print "Got exception in eat_alert: #{e}\n"
+      end
     end
   end
 
@@ -492,7 +491,7 @@ module GeneralSeleniumUtility
     end
     options.each do |manip_type, *args|
       if manip_type != nil
-        manipulate_option(manip_type.to_sym, *args )
+        manipulate_option_raw(manip_type.to_sym, *args )
         print "."
       end
     end
@@ -511,7 +510,16 @@ module GeneralSeleniumUtility
   # correct option itself.
   #
   #****************
-  def manipulate_option(manip_type, how, what, option_attribute, option_attribute_value)
+  def manipulate_option(yaml_data_key)
+      manipulate_option_raw(
+        get_yaml_data( yaml_data_key, 0 ).to_sym,
+        get_yaml_data( yaml_data_key, 1 ).to_sym,
+        get_yaml_data( yaml_data_key, 2 ),
+        get_yaml_data( yaml_data_key, 3 ),
+        get_yaml_data( yaml_data_key, 4 )
+      )
+  end
+  def manipulate_option_raw(manip_type, how, what, option_attribute, option_attribute_value)
     select_element = @driver.find_element(how.to_sym, what)
     found=false
     select_element.find_elements(:tag_name, "option").each do |option|
