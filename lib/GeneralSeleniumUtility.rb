@@ -185,7 +185,7 @@ module GeneralSeleniumUtility
     e.click.should be_nil
 
     # Give it a few chances here
-    10.times do 
+    3.times do 
       # this sometimes fails due to popups, at least on chrome
       begin
         if alert_text
@@ -323,7 +323,6 @@ module GeneralSeleniumUtility
       quiesce
     else
       begin
-        quiesce
         a = @driver.switch_to.alert
         a.text.should == text
         a.accept
