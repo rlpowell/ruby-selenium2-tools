@@ -4,8 +4,8 @@ share_as :Setup do
   describe 'set up google' do
     it "should load the remote driver" do
       # FIXME: Maybe increase this timeout
-      @driver.manage.timeouts.implicit_wait = 5 # seconds
-      @driver.class.name.should == "Selenium::WebDriver::Driver"
+      $driver.manage.timeouts.implicit_wait = 5 # seconds
+      $driver.class.name.should == "Selenium::WebDriver::Driver"
     end
 
     it "should load the setup page" do

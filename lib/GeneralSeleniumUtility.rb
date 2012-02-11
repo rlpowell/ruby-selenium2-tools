@@ -23,27 +23,27 @@
 module GeneralSeleniumUtility
 
   #****************
-  # Given the value of @browser, opens the browser as a remote
-  # SeleniumWebdriver instance, and stores it in @driver
+  # Given the value of $browser, opens the browser as a remote
+  # SeleniumWebdriver instance, and stores it in $driver
   #****************
   def selenium_setup
-    if @browser.to_sym == :chrome
-      @debug and print "I THINK I AM CHROME\n"
+    if $browser.to_sym == :chrome
+      $debug and print "I THINK I AM CHROME\n"
       caps = Selenium::WebDriver::Remote::Capabilities.chrome
       caps['chrome.switches'] = %w[--ignore-certificate-errors]
 
-      @driver = Selenium::WebDriver.for( :remote,  :url => "http://localhost:#{@port}/wd/hub",
+      $driver = Selenium::WebDriver.for( :remote,  :url => "http://localhost:#{$port}/wd/hub",
                                         :desired_capabilities => caps)
-    elsif @browser.to_sym == :ffnonative
-      @debug and print "I THINK I AM FIREFOX, NO NATIVE EVENTS\n"
+    elsif $browser.to_sym == :ffnonative
+      $debug and print "I THINK I AM FIREFOX, NO NATIVE EVENTS\n"
       profile = Selenium::WebDriver::Firefox::Profile.new
-      @debug and print "profile: #{profile.inspect}\n"
+      $debug and print "profile: #{profile.inspect}\n"
       # See http://code.google.com/p/selenium/issues/detail?id=3154
       profile['toolkit.telemetry.prompted'] = '2'
       profile['toolkit.telemetry.enabled'] = 'true'
       profile['toolkit.telemetry.rejected'] = 'false'
       profile.native_events = false
-      @debug and print "profile: #{profile.inspect}\n"
+      $debug and print "profile: #{profile.inspect}\n"
         
       caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile,
                                                                :browser_name          => "firefox",
@@ -52,21 +52,21 @@ module GeneralSeleniumUtility
                                                                :css_selectors_enabled => true,
                                                                :native_events         => false
                                                               )
-      @driver = Selenium::WebDriver.for( :remote,  :url => "http://localhost:#{@port}/wd/hub",
+      $driver = Selenium::WebDriver.for( :remote,  :url => "http://localhost:#{$port}/wd/hub",
                                         :desired_capabilities => caps)
 
       print "HANDLING OF THE MOZILLA TELEMETRY QUESTION IS BROKEN.  Please answer it manually, and hit return when done: "
       File.open("/dev/tty", "r").gets
-    elsif @browser.to_sym == :ffnative
-      @debug and print "I THINK I AM FIREFOX, NATIVE EVENTS ONLY\n"
+    elsif $browser.to_sym == :ffnative
+      $debug and print "I THINK I AM FIREFOX, NATIVE EVENTS ONLY\n"
       profile = Selenium::WebDriver::Firefox::Profile.new
-      @debug and print "profile: #{profile.inspect}\n"
+      $debug and print "profile: #{profile.inspect}\n"
       # See http://code.google.com/p/selenium/issues/detail?id=3154
       profile['toolkit.telemetry.prompted'] = '2'
       profile['toolkit.telemetry.enabled'] = 'true'
       profile['toolkit.telemetry.rejected'] = 'false'
       profile.native_events = true
-      @debug and print "profile: #{profile.inspect}\n"
+      $debug and print "profile: #{profile.inspect}\n"
         
       caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile,
                                                                :browser_name          => "firefox",
@@ -75,14 +75,14 @@ module GeneralSeleniumUtility
                                                                :css_selectors_enabled => true,
                                                                :native_events         => true
                                                               )
-      @driver = Selenium::WebDriver.for( :remote,  :url => "http://localhost:#{@port}/wd/hub",
+      $driver = Selenium::WebDriver.for( :remote,  :url => "http://localhost:#{$port}/wd/hub",
                                         :desired_capabilities => caps)
 
       print "HANDLING OF THE MOZILLA TELEMETRY QUESTION IS BROKEN.  Please answer it manually, and hit return when done: "
       File.open("/dev/tty", "r").gets
     else
-      @driver = Selenium::WebDriver.for( :remote,  :url => "http://localhost:#{@port}/wd/hub",
-                                        :desired_capabilities => @browser.to_sym )
+      $driver = Selenium::WebDriver.for( :remote,  :url => "http://localhost:#{$port}/wd/hub",
+                                        :desired_capabilities => $browser.to_sym )
     end
   end
 
@@ -132,9 +132,9 @@ module GeneralSeleniumUtility
   # Go to the page url given by the yaml_data key
   #****************
   def go_to(yaml_data_key)
-    @driver.navigate.to get_yaml_data( yaml_data_key, 0 )
+    $driver.navigate.to get_yaml_data( yaml_data_key, 0 )
     quiesce
-    @driver.current_url.should =~ Regexp.new(get_yaml_data(yaml_data_key, 1), Regexp::MULTILINE)
+    $driver.current_url.should =~ Regexp.new(get_yaml_data(yaml_data_key, 1), Regexp::MULTILINE)
   end
 
   #****************
@@ -150,7 +150,7 @@ module GeneralSeleniumUtility
       )
   end
   def check_element_send_keys_raw(how, what, tag_name, to_type)
-    e = @driver.find_element(how, what)
+    e = $driver.find_element(how, what)
     e.tag_name.should == tag_name
     3.times do |x|
       e.clear
@@ -180,7 +180,7 @@ module GeneralSeleniumUtility
       )
   end
   def check_element_click_raw(how, what, tag_name, resulting_url, alert_text = nil)
-    e = @driver.find_element(how, what)
+    e = $driver.find_element(how, what)
     e.tag_name.should == tag_name
     e.click.should be_nil
 
@@ -194,10 +194,10 @@ module GeneralSeleniumUtility
 
         quiesce
       rescue Exception => e
-        @debug and print "Got exception in check_element_click: #{e}\n"
+        $debug and print "Got exception in check_element_click: #{e}\n"
       end
 
-      if @driver.current_url =~ Regexp.new(resulting_url, Regexp::MULTILINE)
+      if $driver.current_url =~ Regexp.new(resulting_url, Regexp::MULTILINE)
         break
       end
 
@@ -224,8 +224,8 @@ module GeneralSeleniumUtility
       )
   end
   def no_move_click_raw(how, what, tag_name)
-      e = @driver.find_element(how, what)
-      @debug and print "In no_move_click, e: #{e}\n"
+      e = $driver.find_element(how, what)
+      $debug and print "In no_move_click, e: #{e}\n"
       e.tag_name.should == tag_name
       e.click.should be_nil
   end
@@ -241,14 +241,14 @@ module GeneralSeleniumUtility
   #****************
   def multi_no_move_click( elements, before = false, after = false )
     elements.each do |how, what, tag_name|
-      @debug and print "In multi_no_move_click: #{how}, #{what}, #{tag_name}\n"
+      $debug and print "In multi_no_move_click: #{how}, #{what}, #{tag_name}\n"
       if before
-        @debug and print "In multi_no_move_click, calling before\n"
+        $debug and print "In multi_no_move_click, calling before\n"
         before.call
       end
       no_move_click( how, what, tag_name )
       if after
-        @debug and print "In multi_no_move_click, calling after\n"
+        $debug and print "In multi_no_move_click, calling after\n"
         after.call
       end
     end
@@ -258,9 +258,9 @@ module GeneralSeleniumUtility
   # Does what it says  :)
   #****************
   def close_current_window()
-    @driver.close.should be_nil
+    $driver.close.should be_nil
     # Just in case
-    @driver.switch_to.window(@driver.window_handles.last).should be_nil
+    $driver.switch_to.window($driver.window_handles.last).should be_nil
   end
 
   #****************
@@ -269,14 +269,14 @@ module GeneralSeleniumUtility
   #
   # In other words, we totally fake this -_-
   #
-  # Also, it doesn't work if @server_url is the current page
+  # Also, it doesn't work if $yaml_data['server_url'] is the current page
   # (although that's unlikely)
   #****************
   def refresh
-    url=@driver.current_url
-    @driver.navigate.to @server_url
-    @driver.navigate.to url
-    @driver.current_url.should == url
+    url=$driver.current_url
+    go_to('server_url')
+    go_to(url)
+    $driver.current_url.should == url
     return quiesce
   end
 
@@ -285,20 +285,20 @@ module GeneralSeleniumUtility
   # popup, which it then switches to.
   #****************
   def click_and_change_window(how, what, tag_name, resulting_url)
-    e = @driver.find_element(how, what)
+    e = $driver.find_element(how, what)
     3.times do 
       e.tag_name.should == tag_name
       e.click.should be_nil
 
       quiesce
 
-      if @driver.window_handles.length > 1
+      if $driver.window_handles.length > 1
         break
       end
     end
 
     # The actual window switching
-    @driver.switch_to.window(@driver.window_handles.last).should be_nil
+    $driver.switch_to.window($driver.window_handles.last).should be_nil
 
     check_url_match(resulting_url)
     return e
@@ -308,7 +308,7 @@ module GeneralSeleniumUtility
   # Just checks that the element has the given text
   #****************
   def check_element_text(how, what, text)
-    e = @driver.find_element(how, what)
+    e = $driver.find_element(how, what)
     e.text.should == text
   end
 
@@ -317,18 +317,18 @@ module GeneralSeleniumUtility
   # and clicks "yes" or similar.
   #****************
   def eat_alert(text)
-    if @browser.to_sym == :chrome
+    if $browser.to_sym == :chrome
       print "ALERT HANDLING IS BROKEN ON CHROME, so I'm pausing for you to click the alert.  Hit enter when ready to continue:  "
       File.open("/dev/tty", "r").gets
       quiesce
     else
       begin
-        a = @driver.switch_to.alert
+        a = $driver.switch_to.alert
         a.text.should == text
         a.accept
         quiesce
       rescue Exception => e
-          @debug and print "Got exception in eat_alert: #{e}\n"
+          $debug and print "Got exception in eat_alert: #{e}\n"
       end
     end
   end
@@ -350,7 +350,6 @@ module GeneralSeleniumUtility
   # Drops into a debugger
   #****************
   def wait_for_user()
-    require 'ruby-debug'
     debugger
   end
 
@@ -358,7 +357,7 @@ module GeneralSeleniumUtility
   # Checks that the current page title equals the given text
   #****************
   def check_page_title(text)
-    @driver.title.should == text
+    $driver.title.should == text
   end
 
   #****************
@@ -366,7 +365,7 @@ module GeneralSeleniumUtility
   # treated as a regex
   #****************
   def check_url_match(string)
-    @driver.current_url.should =~ Regexp.new(string, Regexp::MULTILINE)
+    $driver.current_url.should =~ Regexp.new(string, Regexp::MULTILINE)
   end
 
   #****************
@@ -377,7 +376,7 @@ module GeneralSeleniumUtility
   # "Loading..." messages to see when things are done
   #****************
   def check_page_source_match(string)
-    @driver.page_source.should =~ Regexp.new(string, Regexp::MULTILINE)
+    $driver.page_source.should =~ Regexp.new(string, Regexp::MULTILINE)
   end
 
   #****************
@@ -385,7 +384,7 @@ module GeneralSeleniumUtility
   # the given text
   #****************
   def check_attribute(how, what, attribute, string)
-    e = @driver.find_element(how, what)
+    e = $driver.find_element(how, what)
     e.attribute(attribute).should == string
   end
 
@@ -394,8 +393,8 @@ module GeneralSeleniumUtility
   # the given text treated as a regex
   #****************
   def check_attribute_match(how, what, attribute, string)
-    e = @driver.find_element(how, what)
-    if e.attribute(attribute) !~ Regexp.new(string, Regexp::MULTILINE) and @debug
+    e = $driver.find_element(how, what)
+    if e.attribute(attribute) !~ Regexp.new(string, Regexp::MULTILINE) and $debug
       wait_for_user()
     end
     e.attribute(attribute).should =~ Regexp.new(string, Regexp::MULTILINE)
@@ -409,13 +408,13 @@ module GeneralSeleniumUtility
   #****************
   def quiesce()
     source1 = nil
-    source2 = @driver.page_source
+    source2 = $driver.page_source
 
     i = 0
     while source1 != source2 or source2.match(/[^">]Loading...[^"]/) or source2.match(/[^">]Updating...[^"&]/)
 
       # Debugging check
-      if i > 5 and @debug
+      if i > 5 and $debug
         print "Still loading?  Really?\n"
         File.open("/tmp/source1", 'w') {|f| f.write(source1) }
         File.open("/tmp/source2", 'w') {|f| f.write(source2) }
@@ -430,7 +429,7 @@ module GeneralSeleniumUtility
       sleep 1
       print "-"
       source1 = source2
-      source2 = @driver.page_source
+      source2 = $driver.page_source
     end
     return source1 == source2
   end
@@ -446,7 +445,7 @@ module GeneralSeleniumUtility
     e = nil
     5.times do |x|
       # note that find-element auto-waits
-      e = @driver.find_element(how, what)
+      e = $driver.find_element(how, what)
       if e.displayed?
         break
       end
@@ -462,7 +461,7 @@ module GeneralSeleniumUtility
   # given file.
   #****************
   def dump_page_source(file)
-    File.open(file, 'w') {|f| f.write(@driver.page_source) }
+    File.open(file, 'w') {|f| f.write($driver.page_source) }
   end
 
   #****************
@@ -471,7 +470,7 @@ module GeneralSeleniumUtility
   #****************
   def multi_source_text_check(texts)
     texts.each do |text|
-      page_text = @driver.page_source
+      page_text = $driver.page_source
       page_text.gsub!(/<[^>]*>/, '')
       page_text.gsub!(/\s+/, ' ')
       page_text.should include( text )
@@ -519,7 +518,7 @@ module GeneralSeleniumUtility
       )
   end
   def manipulate_option_raw(manip_type, how, what, option_attribute, option_attribute_value)
-    select_element = @driver.find_element(how.to_sym, what)
+    select_element = $driver.find_element(how.to_sym, what)
     found=false
     select_element.find_elements(:tag_name, "option").each do |option|
       if( option.attribute(option_attribute) == option_attribute_value )
@@ -572,19 +571,19 @@ module GeneralSeleniumUtility
   def drag_to_order( dimension, items )
     positions = Array.new
     items.each_index do |n|
-      item=@driver.find_element( items[n][0].to_sym, items[n][1] )
+      item=$driver.find_element( items[n][0].to_sym, items[n][1] )
       positions[n] = item.location.send( dimension )
     end
     positions.sort!
-    @debug and print "In drag_to_order: items: #{YAML.dump(items)}\n"
-    @debug and print "In drag_to_order: positions: #{YAML.dump(positions)}\n"
+    $debug and print "In drag_to_order: items: #{YAML.dump(items)}\n"
+    $debug and print "In drag_to_order: positions: #{YAML.dump(positions)}\n"
     drag_to_order_internal( dimension, items, positions )
 
     # Then we re-pull the positions and check them
     last=0
     current=0
     items.each_index do |n|
-      item=@driver.find_element( items[n][0].to_sym, items[n][1] )
+      item=$driver.find_element( items[n][0].to_sym, items[n][1] )
       current = item.location.send( dimension )
       current.should satisfy { |current| current > last }
       last = current
@@ -598,7 +597,7 @@ module GeneralSeleniumUtility
     end
 
     while true
-      current=@driver.find_element( items[0][0].to_sym, items[0][1] )
+      current=$driver.find_element( items[0][0].to_sym, items[0][1] )
 
       current_loc = current.location.send( dimension )
       jitter = 0
@@ -610,10 +609,10 @@ module GeneralSeleniumUtility
 
       diff = positions[0] - current_loc
 
-      @debug and print "In drag_to_order_internal: current: #{current}\n"
-      @debug and print "In drag_to_order_internal: d0: #{positions[0]}\n"
-      @debug and print "In drag_to_order_internal: current_loc: #{current_loc}\n"
-      @debug and print "In drag_to_order_internal:diff : #{diff}\n"
+      $debug and print "In drag_to_order_internal: current: #{current}\n"
+      $debug and print "In drag_to_order_internal: d0: #{positions[0]}\n"
+      $debug and print "In drag_to_order_internal: current_loc: #{current_loc}\n"
+      $debug and print "In drag_to_order_internal:diff : #{diff}\n"
 
       # Increase the absolute value of diff slightly, and keep the
       # sign
@@ -643,10 +642,10 @@ module GeneralSeleniumUtility
   # way you expect.
   #****************
   def hover_and_move_slow(how, what, move_x, move_y)
-    @debug and print "In hover_and_move_slow: #{how}, #{what}, #{move_x}, #{move_y}\n"
+    $debug and print "In hover_and_move_slow: #{how}, #{what}, #{move_x}, #{move_y}\n"
     distance = [ 40, ((move_x + move_y)/4).abs].max
-    e=@driver.find_element(how, what)
-    @driver.action.click_and_hold(e).perform
+    e=$driver.find_element(how, what)
+    $driver.action.click_and_hold(e).perform
 
     x = e.location.x
     y = e.location.y
@@ -666,27 +665,27 @@ module GeneralSeleniumUtility
         diff_y = diff_y / 2;
       end
 
-      @debug and print "In hover_and_move_slow: moving x #{diff_x} and y #{diff_y}, given current x #{x} and y #{y} with goals x #{goal_x} and y #{goal_y}\n"
+      $debug and print "In hover_and_move_slow: moving x #{diff_x} and y #{diff_y}, given current x #{x} and y #{y} with goals x #{goal_x} and y #{goal_y}\n"
 
-      @driver.action.move_by(diff_x, diff_y).perform
+      $driver.action.move_by(diff_x, diff_y).perform
 
-      #@debug and sleep 2
+      #$debug and sleep 2
 
-      e=@driver.find_element(how, what)
+      e=$driver.find_element(how, what)
       x = e.location.x
       y = e.location.y
     end
 
-    @debug and print "In hover_and_move_slow: exited main loop, current x #{x} and y #{y} with goals x #{goal_x} and y #{goal_y}\n"
+    $debug and print "In hover_and_move_slow: exited main loop, current x #{x} and y #{y} with goals x #{goal_x} and y #{goal_y}\n"
 
-    @driver.action.release.perform
+    $driver.action.release.perform
   end
 
   #****************
   # Set all of the options to unselected in a multiple select tag
   #****************
   def clear_multi_option_select(how, what)
-    select_element=@driver.find_element(how, what)
+    select_element=$driver.find_element(how, what)
     select_element.find_elements(:tag_name, "option").each do |option|
       if option.selected?
          option.toggle
@@ -703,7 +702,7 @@ module GeneralSeleniumUtility
     found = Array.new
     elements.each do |element|
       print "."
-      e = @driver.find_element(element[0].to_sym, element[1])
+      e = $driver.find_element(element[0].to_sym, element[1])
       wanted << [ element[1], element[2] ]
       found << [ element[1], e.text ]
     end
@@ -721,7 +720,7 @@ module GeneralSeleniumUtility
     found = Array.new
     elements.each do |element|
       print "."
-      e = @driver.find_element(element[0].to_sym, element[1])
+      e = $driver.find_element(element[0].to_sym, element[1])
       wanted << [ element[1], element[2], element[3] ]
       found  << [ element[1], element[2], e.attribute(element[2]) ]
     end

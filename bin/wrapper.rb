@@ -2,7 +2,6 @@ require 'rubygems'
 gem 'selenium-webdriver'
 require "selenium-webdriver"
 require 'rspec'
-require 'ruby-debug'
 require 'yaml'
 
 require 'rspec/core/formatters/documentation_formatter'
@@ -17,6 +16,11 @@ end
 # Deal with environment arguments
 if ENV['DEBUG'] == 'true'
   $debug = true
+
+  require "ruby-debug"
+
+  Debugger.settings[:autoeval] = true  # try eval on unknown debugger commands
+  Debugger.start
 else
   $debug = false
 end
@@ -68,9 +72,6 @@ Dir.glob("yaml/[0-9]*.yaml").sort.each do |file|
   data.delete('conditions')
   $yaml_data.merge!(data)
   $debug and print "yaml_data after #{file}: #{$yaml_data.inspect}\n"
-  #load_yaml_data( ENV['YAML_START_FILE'] )
-  #@yaml_data['yaml_files'].each do |file|
-  #  load_yaml_data( file )
 end
 
 # Trim out any sections the user doesn't want
@@ -117,14 +118,7 @@ describe "wrapper" do
   end
 
   before(:all) do
-    @debug = $debug
-    @port = $port
-    @browser = $browser
-    @test_set = $test_set
-    @yaml_data = $yaml_data
-
     selenium_setup
-
   end
 
   $yaml_data['sections'].each do |section|
@@ -134,6 +128,6 @@ describe "wrapper" do
   end
 
   after(:all) do
-    @debug or @driver.quit
+    $debug or $driver.quit
   end
 end
