@@ -264,20 +264,18 @@ module GeneralSeleniumUtility
   end
 
   #****************
-  # A fake page refresh that works by going to the very first URL we
-  # loaded, and then back to the current page.
+  # A fake page refresh that works by going to a fixed URL, and then
+  # back to the current page.
   #
   # In other words, we totally fake this -_-
-  #
-  # Also, it doesn't work if $yaml_data['server_url'] is the current page
-  # (although that's unlikely)
   #****************
   def refresh
     url=$driver.current_url
-    go_to('server_url')
-    go_to(url)
+    $driver.navigate.to 'http://www.google.com/'
+    quiesce
+    $driver.navigate.to url
+    quiesce
     $driver.current_url.should == url
-    return quiesce
   end
 
   #****************
@@ -404,30 +402,42 @@ module GeneralSeleniumUtility
   # Tries to make sure that a page has completely finished loading
   # all javascripty bits by looking for text like "Loading..."
   #
-  # Probably tied to tightly to the initial dev environment.
+  # Probably tied too tightly to the initial dev environment.
   #****************
-  def quiesce()
+  def quiesce(to_check=nil)
     source1 = nil
     source2 = $driver.page_source
 
     i = 0
-    while source1 != source2 or source2.match(/[^">]Loading...[^"]/) or source2.match(/[^">]Updating...[^"&]/)
+    int_to_check = []
+    if to_check == nil
+      int_to_check = [ /[^">]Loading...[^"]/, /[^">]Updating...[^"&]/ ]
+    else
+      int_to_check = to_check
+    end
+
+    while source1 != source2 or int_to_check.any? { |x| print "matching: #{x.to_s}: #{(source2 =~ x).inspect}\n" ; source2 =~ x }
 
       # Debugging check
       if i > 5 and $debug
         print "Still loading?  Really?\n"
         File.open("/tmp/source1", 'w') {|f| f.write(source1) }
         File.open("/tmp/source2", 'w') {|f| f.write(source2) }
-        dump_page_source("/tmp/still-loading.html")
-        wait_for_user
+        if $yaml_data['debug_loading']
+          dump_page_source("/tmp/still-loading.html")
+          wait_for_user
+        end
       end
 
       i += 1
-      if i > 10
-        break
+      if i > 30
+      	RSpec::Expectations::fail_with( "quiesce took too long so we're erroring out" )
       end
-      sleep 1
+
+      sleep 6
+
       print "-"
+
       source1 = source2
       source2 = $driver.page_source
     end
@@ -435,18 +445,50 @@ module GeneralSeleniumUtility
   end
 
   #****************
+  # Waits until an element appears for the given amount of ten
+  # second waits
+  #****************
+  def long_wait_for_element(yaml_data_key, times = 6)
+    how = get_yaml_data( yaml_data_key, 0 )
+    what = get_yaml_data( yaml_data_key, 1 )
+    e = nil
+    times.times do
+      # note that find-element auto-waits
+      begin
+        e = $driver.find_element(how, what)
+      rescue Exception => error
+        $debug and print "Got exception in long_wait_for_element: #{error}\n"
+      end
+      if e and e.displayed?
+        $debug and print "element in long_wait_for_element: #{e.inspect}\n"
+        break
+      end
+      $debug and print "waiting in long_wait_for_elemnt\n"
+
+      sleep 10
+    end
+    e.should be_displayed
+    return e
+  end
+
+  #****************
   # Gives an element a while (about 5 seconds) to show up on the
   # page, errors if it doesn't.
   #****************
-  def wait_for_element(yaml_data_key)
+  def wait_for_element(yaml_data_key, times = 5)
     wait_for_element_raw(get_yaml_data( yaml_data_key, 0 ), get_yaml_data( yaml_data_key, 1 ))
   end
-  def wait_for_element_raw(how, what)
+  def wait_for_element_raw(how, what, times = 5)
     e = nil
-    5.times do |x|
+    times.times do |x|
       # note that find-element auto-waits
-      e = $driver.find_element(how, what)
-      if e.displayed?
+      e = nil
+      begin
+        e = $driver.find_element(how, what)
+      rescue Exception => error
+        $debug and print "Got exception in wait_for_element: #{error}\n"
+      end
+      if e and e.displayed?
         break
       end
       sleep 1
